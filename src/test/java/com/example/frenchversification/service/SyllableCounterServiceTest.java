@@ -94,4 +94,42 @@ public class SyllableCounterServiceTest {
         List<Integer> counts = syllableCounterService.countSyllables(List.of("Il pense voir en pleurs dissiper cet orage"));
         assertEquals(12, counts.get(0), "Racine's alexandrin should be 12 syllables");
     }
+
+    // Décasyllabe Tests (10 syllables)
+    @Test
+    public void testValeryDecasyllabe() {
+        List<Integer> counts = syllableCounterService.countSyllables(List.of("La mer, la mer, toujours recommencée!"));
+        assertEquals(10, counts.get(0), "Valéry's décasyllabe should be 10 syllables");
+    }
+
+    @Test
+    public void testBaudelaireDecasyllabe() {
+        List<Integer> counts = syllableCounterService.countSyllables(List.of("Nous aurons des lits pleins d'odeurs légères"));
+        assertEquals(10, counts.get(0), "Baudelaire's décasyllabe should be 10 syllables");
+    }
+
+    @Test
+    public void testDuBellayDecasyllabe() {
+        List<Integer> counts = syllableCounterService.countSyllables(List.of("Déjà la nuit en son parc amassait"));
+        assertEquals(10, counts.get(0), "Du Bellay's décasyllabe should be 10 syllables");
+    }
+
+    // Hendécasyllabe Tests (11 syllables)
+    @Test
+    public void testDesbordesValmoreHendecasyllabe1() {
+        List<Integer> counts = syllableCounterService.countSyllables(List.of("Ô champs paternels hérissés de charmilles"));
+        assertEquals(11, counts.get(0), "Desbordes-Valmore's hendécasyllabe should be 11 syllables");
+    }
+
+    @Test
+    public void testDesbordesValmoreHendecasyllabe2() {
+        List<Integer> counts = syllableCounterService.countSyllables(List.of("Où glissent le soir des flots de jeunes filles!"));
+        assertEquals(11, counts.get(0), "Desbordes-Valmore's hendécasyllabe should be 11 syllables");
+    }
+
+    @Test
+    public void testRimbaudHendecasyllabe() {
+        List<Integer> counts = syllableCounterService.countSyllables(List.of("Loin des oiseaux, des troupeaux, des villageoises,"));
+        assertEquals(11, counts.get(0), "Rimbaud's hendécasyllabe should be 11 syllables");
+    }
 }
