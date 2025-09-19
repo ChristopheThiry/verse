@@ -73,4 +73,25 @@ public class SyllableCounterServiceTest {
         assertEquals(0, counts.get(1));
         assertEquals(0, counts.get(2));
     }
+
+    @Test
+    public void testHugoAlexandrin() {
+        // "Le soir tombait; la lutte était ardente et noire." - Victor Hugo
+        List<Integer> counts = syllableCounterService.countSyllables(List.of("Le soir tombait; la lutte était ardente et noire."));
+        assertEquals(12, counts.get(0), "Hugo's alexandrin should be 12 syllables");
+    }
+
+    @Test
+    public void testCorneilleAlexandrin() {
+        // "Nous partîmes cinq cents; mais par un prompt renfort" - Corneille
+        List<Integer> counts = syllableCounterService.countSyllables(List.of("Nous partîmes cinq cents; mais par un prompt renfort"));
+        assertEquals(12, counts.get(0), "Corneille's alexandrin should be 12 syllables");
+    }
+
+    @Test
+    public void testRacineAlexandrin() {
+        // "Il pense voir en pleurs dissiper cet orage" - Racine
+        List<Integer> counts = syllableCounterService.countSyllables(List.of("Il pense voir en pleurs dissiper cet orage"));
+        assertEquals(12, counts.get(0), "Racine's alexandrin should be 12 syllables");
+    }
 }
