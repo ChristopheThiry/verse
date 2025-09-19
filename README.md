@@ -9,15 +9,25 @@ This project is a Spring Boot backend application designed to count the syllable
     *   Handling of the mute 'e' (`e caduc`).
     *   Elision between words.
     *   Basic heuristics for diérèse.
-*   Built with Java 17 and Spring Boot.
+*   Built with Java 21 and Spring Boot.
 *   Managed with Apache Maven.
 *   Includes a suite of JUnit 5 tests.
+*   Provides an interactive API documentation via Swagger UI.
 
 ## Technologies Used
 
-*   **Java 17**
+*   **Java 21**
 *   **Spring Boot 3.2.2**
 *   **Apache Maven**
+*   **SpringDoc OpenAPI (Swagger UI)**
+
+## Interactive API Documentation (Swagger UI)
+
+This project includes an interactive OpenAPI (Swagger) UI for exploring and testing the API endpoints. Once the application is running, you can access the Swagger UI at the following URL:
+
+[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+
+The UI allows you to see the API structure and send test requests directly from your browser.
 
 ## API Usage
 
