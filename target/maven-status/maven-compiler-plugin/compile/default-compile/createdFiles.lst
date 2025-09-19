@@ -1,5 +1,0 @@
-com/example/frenchversification/FrenchVersificationApplication.class
-com/example/frenchversification/dto/PoemRequest.class
-com/example/frenchversification/service/SyllableCounterService.class
-com/example/frenchversification/controller/PoemController.class
-com/example/frenchversification/dto/SyllableCountResponse.class
