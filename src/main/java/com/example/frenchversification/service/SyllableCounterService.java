@@ -1,11 +1,14 @@
 package com.example.frenchversification.service;
 
+import com.example.frenchversification.dto.LineAnalysisResult;
+import com.example.frenchversification.dto.SyllableCountResponse;
 import org.springframework.stereotype.Service;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class SyllableCounterService {
@@ -13,13 +16,39 @@ public class SyllableCounterService {
     private static final String VOWELS = "aeiouy";
     private static final Set<String> H_ASPIRE_WORDS = Set.of("haut", "heros", "hache", "haie", "haine", "harpe", "hasard", "honte", "hussard", "hollande", "handicap", "hibou", "herisson");
 
-    public List<Integer> countSyllables(List<String> lines) {
+    public SyllableCountResponse analyzeLines(List<String> lines) {
         if (lines == null) {
-            return new ArrayList<>();
+            return new SyllableCountResponse(new ArrayList<>());
         }
-        return lines.stream()
-                .map(this::countSyllablesInLine)
+
+        List<LineAnalysisResult> results = IntStream.range(0, lines.size())
+                .mapToObj(i -> {
+                    String line = lines.get(i);
+                    int syllableCount = countSyllablesInLine(line);
+                    String footsDecomposition = generateFootsDecomposition(syllableCount);
+                    return new LineAnalysisResult(i + 1, syllableCount, footsDecomposition);
+                })
                 .collect(Collectors.toList());
+
+        return new SyllableCountResponse(results);
+    }
+
+    private String generateFootsDecomposition(int syllableCount) {
+        if (syllableCount <= 0) {
+            return "";
+        }
+        List<String> feet = new ArrayList<>();
+        int remainingSyllables = syllableCount;
+        while (remainingSyllables > 0) {
+            if (remainingSyllables >= 2) {
+                feet.add("2");
+                remainingSyllables -= 2;
+            } else {
+                feet.add("1");
+                remainingSyllables -= 1;
+            }
+        }
+        return String.join(" ", feet);
     }
 
     private int countSyllablesInLine(String line) {

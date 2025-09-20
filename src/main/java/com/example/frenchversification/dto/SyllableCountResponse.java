@@ -4,17 +4,18 @@ import java.util.List;
 
 public class SyllableCountResponse {
 
-    private List<Integer> syllable_counts;
+    private List<LineAnalysisResult> results;
 
-    public SyllableCountResponse(List<Integer> syllable_counts) {
-        this.syllable_counts = syllable_counts;
+    public SyllableCountResponse(List<LineAnalysisResult> results) {
+        this.results = results;
     }
 
-    public List<Integer> getSyllable_counts() {
-        return syllable_counts;
+    // Getters and setters
+    public List<LineAnalysisResult> getResults() {
+        return results;
     }
 
-    public void setSyllable_counts(List<Integer> syllable_counts) {
-        this.syllable_counts = syllable_counts;
+    public void setResults(List<LineAnalysisResult> results) {
+        this.results = results;
     }
 }

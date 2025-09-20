@@ -24,7 +24,6 @@ public class PoemController {
 
     @PostMapping("/count-syllables")
     public SyllableCountResponse countSyllables(@RequestBody PoemRequest poemRequest) {
-        List<Integer> counts = syllableCounterService.countSyllables(poemRequest.getLines());
-        return new SyllableCountResponse(counts);
+        return syllableCounterService.analyzeLines(poemRequest.getLines());
     }
 }
