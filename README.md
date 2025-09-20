@@ -51,14 +51,22 @@ The request body should be a JSON object containing a list of strings, where eac
 
 ### Response Body
 
-The service will respond with a JSON object containing a list of integers, representing the syllable count for each line.
+The service will respond with a JSON object containing a list of objects, where each object represents the analysis for a single line.
 
 **Example:**
 ```json
 {
-    "syllable_counts": [
-        12,
-        12
+    "results": [
+        {
+            "lineNumber": 1,
+            "syllableCount": 12,
+            "footsDecomposition": "2 2 2 2 2 2"
+        },
+        {
+            "lineNumber": 2,
+            "syllableCount": 12,
+            "footsDecomposition": "2 2 2 2 2 2"
+        }
     ]
 }
 ```
