@@ -63,6 +63,48 @@ The service will respond with a JSON object containing a list of integers, repre
 }
 ```
 
+### Interfacing with a Node.js Frontend
+
+Here is an example of how to call the API from a Node.js application using the `axios` library.
+
+First, make sure you have `axios` installed:
+
+```bash
+npm install axios
+```
+
+Then, you can use the following code to send a POST request to the backend:
+
+```javascript
+const axios = require('axios');
+
+async function getSyllableCounts(lines) {
+  try {
+    const response = await axios.post('http://localhost:8080/api/v1/count-syllables', { lines });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching syllable counts:', error);
+    throw error;
+  }
+}
+
+// Example usage:
+const poemLines = [
+  "Ma seule étoile est morte, - et mon luth constellé",
+  "Porte le Soleil noir de la Mélancolie."
+];
+
+getSyllableCounts(poemLines)
+  .then(data => {
+    console.log('Syllable counts:', data.results);
+  })
+  .catch(error => {
+    // Handle error
+  });
+```
+
+This example defines an `async` function `getSyllableCounts` that takes an array of strings (the lines of the poem) and sends them to the backend. It then prints the results to the console.
+
 ## How to Run the Application
 
 ### Prerequisites
