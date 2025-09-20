@@ -4,12 +4,14 @@ import org.springframework.stereotype.Service;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class SyllableCounterService {
 
     private static final String VOWELS = "aeiouy";
+    private static final Set<String> H_ASPIRE_WORDS = Set.of("haut", "heros", "hache", "haie", "haine", "harpe", "hasard", "honte", "hussard", "hollande", "handicap", "hibou", "herisson");
 
     public List<Integer> countSyllables(List<String> lines) {
         if (lines == null) {
@@ -36,25 +38,58 @@ public class SyllableCounterService {
         String[] words = cleanedLine.split("\\s+");
         int totalSyllables = 0;
 
-        for (String word : words) {
-            totalSyllables += countVowelGroups(normalizeString(word));
-        }
-
-        // Rule for mute 'e' at the end of the line
-        if (words.length > 0) {
-            String lastWord = normalizeString(words[words.length - 1]);
-            if (lastWord.length() > 2 && (lastWord.endsWith("e") || lastWord.endsWith("es"))) {
-                char charBeforeE = lastWord.charAt(lastWord.length() - (lastWord.endsWith("es") ? 3 : 2));
-                if (!isVowel(charBeforeE)) {
-                    totalSyllables--;
-                }
-            }
-            if (lastWord.length() > 3 && lastWord.endsWith("ent")) {
-                totalSyllables--;
-            }
+        for (int i = 0; i < words.length; i++) {
+            String currentWord = words[i];
+            String nextWord = (i < words.length - 1) ? words[i+1] : null;
+            totalSyllables += countSyllables(currentWord, nextWord);
         }
 
         return totalSyllables;
+    }
+
+    private int countSyllables(String word, String nextWord) {
+        String originalWord = word.toLowerCase();
+        if (originalWord.startsWith("'")) {
+            originalWord = originalWord.substring(1);
+        }
+
+        String normalized = normalizeString(originalWord);
+        if (normalized.isEmpty()) {
+            return 0;
+        }
+
+        int syllableCount = countVowelGroups(normalized);
+
+        // Mute 'e' rule
+        if (normalized.length() > 1 && (normalized.endsWith("e") || normalized.endsWith("es"))) {
+            boolean isPronounced = (nextWord != null && !startsWithVowelOrHmute(nextWord));
+            boolean isAccentAigu = originalWord.endsWith("é") || originalWord.endsWith("ée");
+
+            if (!isPronounced && !isAccentAigu) {
+                char charBeforeE = normalized.charAt(normalized.length() - (normalized.endsWith("es") ? 3 : 2));
+                if (!isVowel(charBeforeE)) {
+                    syllableCount--;
+                }
+            }
+        }
+
+        if (normalized.length() > 3 && normalized.endsWith("ent")) {
+             boolean isPronounced = (nextWord != null && !startsWithVowelOrHmute(nextWord));
+             if(!isPronounced) {
+                 syllableCount--;
+             }
+        }
+
+        // Diérèse/Synérèse very simplified heuristic
+        if(originalWord.contains("tion") || originalWord.contains("sion") || originalWord.contains("cien")) {
+            syllableCount++;
+        }
+
+        if (syllableCount <= 0 && !normalized.isEmpty()) {
+            return 1;
+        }
+
+        return syllableCount;
     }
 
     private int countVowelGroups(String normalizedWord) {
@@ -63,7 +98,9 @@ public class SyllableCounterService {
         boolean lastWasVowel = false;
         for (char c : normalizedWord.toCharArray()) {
             if (isVowel(c)) {
-                if (!lastWasVowel) {
+                if (c == 'y' && lastWasVowel) {
+                    // 'y' after a vowel is usually part of the same sound (e.g. "pays")
+                } else if (!lastWasVowel) {
                     count++;
                 }
                 lastWasVowel = true;
@@ -71,20 +108,38 @@ public class SyllableCounterService {
                 lastWasVowel = false;
             }
         }
-        return count; // Don't assume 1, let it be 0 if no vowels.
+        return count;
     }
 
     private String normalizeString(String s) {
         if (s == null) return "";
         s = s.toLowerCase();
-        if (s.startsWith("'")) {
-            s = s.substring(1);
-        }
         return Normalizer.normalize(s, Normalizer.Form.NFD)
                          .replaceAll("\\p{M}", "");
     }
 
     private boolean isVowel(char c) {
         return VOWELS.indexOf(c) >= 0;
+    }
+
+    private boolean startsWithVowelOrHmute(String word) {
+        if (word == null || word.isEmpty()) {
+            return false;
+        }
+        String normalized = normalizeString(word);
+        if (normalized.isEmpty()) return false;
+
+        if (word.startsWith("'")) {
+            return true;
+        }
+
+        char firstChar = normalized.charAt(0);
+
+        if (isVowel(firstChar)) return true;
+
+        if (firstChar == 'h') {
+            return !H_ASPIRE_WORDS.contains(normalized);
+        }
+        return false;
     }
 }
