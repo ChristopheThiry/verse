@@ -16,6 +16,8 @@ public class SyllableCounterService {
     private static final String VOWELS = "aeiouy";
     private static final Set<String> H_ASPIRE_WORDS = Set.of("haut", "heros", "hache", "haie", "haine", "harpe", "hasard", "honte", "hussard", "hollande", "handicap", "hibou", "herisson");
 
+    private static final Set<String> CONSONANT_CLUSTERS = Set.of("bl", "br", "ch", "cl", "cr", "dr", "fl", "fr", "gl", "gr", "ph", "pl", "pr", "sh", "th", "tr", "vr", "gn");
+
     public SyllableCountResponse analyzeLines(List<String> lines) {
         if (lines == null) {
             return new SyllableCountResponse(new ArrayList<>());
@@ -25,30 +27,81 @@ public class SyllableCounterService {
                 .mapToObj(i -> {
                     String line = lines.get(i);
                     int syllableCount = countSyllablesInLine(line);
-                    String footsDecomposition = generateFootsDecomposition(syllableCount);
-                    return new LineAnalysisResult(i + 1, syllableCount, footsDecomposition);
+                    String syllableDecomposition = generateSyllableDecomposition(line);
+                    return new LineAnalysisResult(i + 1, syllableCount, syllableDecomposition);
                 })
                 .collect(Collectors.toList());
 
         return new SyllableCountResponse(results);
     }
 
-    private String generateFootsDecomposition(int syllableCount) {
-        if (syllableCount <= 0) {
+    private String generateSyllableDecomposition(String line) {
+        if (line == null || line.isBlank()) {
             return "";
         }
-        List<String> feet = new ArrayList<>();
-        int remainingSyllables = syllableCount;
-        while (remainingSyllables > 0) {
-            if (remainingSyllables >= 2) {
-                feet.add("2");
-                remainingSyllables -= 2;
-            } else {
-                feet.add("1");
-                remainingSyllables -= 1;
+        String text = line.toLowerCase().trim();
+        text = text.replaceAll("[\\p{Punct}&&[^']]+", " ");
+        text = text.replaceAll("\\s+", " ").trim();
+
+        if (text.isEmpty()) {
+            return "";
+        }
+
+        String[] words = text.split("\\s+");
+        List<String> resultSyllables = new ArrayList<>();
+        for (String word : words) {
+            resultSyllables.add(decomposeWord(word));
+        }
+        return String.join("-", resultSyllables);
+    }
+
+    private String decomposeWord(String word) {
+        if (word == null || word.isEmpty()) {
+            return "";
+        }
+
+        List<Integer> vowelIndices = new ArrayList<>();
+        for (int i = 0; i < word.length(); i++) {
+            if (isVowel(word.charAt(i))) {
+                if (vowelIndices.isEmpty() || i > vowelIndices.get(vowelIndices.size() - 1) + 1) {
+                    vowelIndices.add(i);
+                }
             }
         }
-        return String.join(" ", feet);
+
+        if (vowelIndices.size() <= 1) {
+            return word;
+        }
+
+        List<String> syllables = new ArrayList<>();
+        int start = 0;
+        for (int i = 0; i < vowelIndices.size() - 1; i++) {
+            int v1 = vowelIndices.get(i);
+            int v2 = vowelIndices.get(i + 1);
+            int consonantsBetween = v2 - v1 - 1;
+
+            int splitIndex;
+            if (consonantsBetween == 1) {
+                splitIndex = v1 + 1; // V-CV
+            } else if (consonantsBetween == 2) {
+                String cluster = word.substring(v1 + 1, v1 + 3);
+                if (CONSONANT_CLUSTERS.contains(cluster)) {
+                    splitIndex = v1 + 1; // V-CCV
+                } else {
+                    splitIndex = v1 + 2; // VC-CV
+                }
+            } else if (consonantsBetween == 3) {
+                splitIndex = v1 + 2; // VC-CCV
+            } else {
+                splitIndex = v1 + (consonantsBetween / 2) + 1;
+            }
+
+            syllables.add(word.substring(start, splitIndex));
+            start = splitIndex;
+        }
+        syllables.add(word.substring(start));
+
+        return String.join("-", syllables);
     }
 
     private int countSyllablesInLine(String line) {

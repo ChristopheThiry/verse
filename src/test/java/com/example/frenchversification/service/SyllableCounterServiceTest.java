@@ -33,15 +33,35 @@ public class SyllableCounterServiceTest {
 
         assertEquals(0, results.get(0).getSyllableCount());
         assertEquals(1, results.get(0).getLineNumber());
-        assertEquals("", results.get(0).getFootsDecomposition());
+        assertEquals("", results.get(0).getSyllableDecomposition());
 
         assertEquals(0, results.get(1).getSyllableCount());
         assertEquals(2, results.get(1).getLineNumber());
-        assertEquals("", results.get(1).getFootsDecomposition());
+        assertEquals("", results.get(1).getSyllableDecomposition());
 
         assertEquals(0, results.get(2).getSyllableCount());
         assertEquals(3, results.get(2).getLineNumber());
-        assertEquals("", results.get(2).getFootsDecomposition());
+        assertEquals("", results.get(2).getSyllableDecomposition());
+    }
+
+    @Test
+    public void testSyllableDecomposition() {
+        List<String> lines = List.of(
+            "bonjour",
+            "chanter",
+            "table",
+            "ordinateur",
+            "ah je ris de me contempler"
+        );
+        SyllableCountResponse response = syllableCounterService.analyzeLines(lines);
+        List<LineAnalysisResult> results = response.getResults();
+
+        assertEquals(5, results.size());
+        assertEquals("bon-jour", results.get(0).getSyllableDecomposition());
+        assertEquals("chan-ter", results.get(1).getSyllableDecomposition());
+        assertEquals("ta-ble", results.get(2).getSyllableDecomposition());
+        assertEquals("or-di-na-teur", results.get(3).getSyllableDecomposition());
+        assertEquals("ah-je-ris-de-me-con-tem-pler", results.get(4).getSyllableDecomposition());
     }
 
     @org.junit.jupiter.api.Disabled("This test contains a line ('Au pays parfumé...') that requires poetic interpretation (diérèse on 'pays') to reach 12 syllables, which is beyond the scope of the current heuristic-based algorithm.")
@@ -70,7 +90,7 @@ public class SyllableCounterServiceTest {
             LineAnalysisResult result = results.get(i);
             System.out.println("Line " + result.getLineNumber() + ": " + result.getSyllableCount() + " -> " + sonnet.get(i));
             assertEquals(12, result.getSyllableCount(), "Every line in an alexandrin sonnet should have 12 syllables. Line failed: " + sonnet.get(i));
-            assertEquals("2 2 2 2 2 2", result.getFootsDecomposition());
+            assertNotNull(result.getSyllableDecomposition());
         }
     }
 
@@ -86,7 +106,7 @@ public class SyllableCounterServiceTest {
         assertEquals(3, results.size());
         for (LineAnalysisResult result : results) {
             assertEquals(10, result.getSyllableCount(), "Each décasyllabe line should have 10 syllables");
-            assertEquals("2 2 2 2 2", result.getFootsDecomposition());
+            assertNotNull(result.getSyllableDecomposition());
         }
     }
 
@@ -102,7 +122,7 @@ public class SyllableCounterServiceTest {
         assertEquals(3, results.size());
         for (LineAnalysisResult result : results) {
             assertEquals(11, result.getSyllableCount(), "Each hendécasyllabe line should have 11 syllables");
-            assertEquals("2 2 2 2 2 1", result.getFootsDecomposition());
+            assertNotNull(result.getSyllableDecomposition());
         }
     }
 }

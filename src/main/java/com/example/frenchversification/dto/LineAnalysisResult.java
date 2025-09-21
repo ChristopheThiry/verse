@@ -4,12 +4,12 @@ public class LineAnalysisResult {
 
     private int lineNumber;
     private int syllableCount;
-    private String footsDecomposition;
+    private String syllableDecomposition;
 
-    public LineAnalysisResult(int lineNumber, int syllableCount, String footsDecomposition) {
+    public LineAnalysisResult(int lineNumber, int syllableCount, String syllableDecomposition) {
         this.lineNumber = lineNumber;
         this.syllableCount = syllableCount;
-        this.footsDecomposition = footsDecomposition;
+        this.syllableDecomposition = syllableDecomposition;
     }
 
     // Getters and setters
@@ -29,11 +29,11 @@ public class LineAnalysisResult {
         this.syllableCount = syllableCount;
     }
 
-    public String getFootsDecomposition() {
-        return footsDecomposition;
+    public String getSyllableDecomposition() {
+        return syllableDecomposition;
     }
 
-    public void setFootsDecomposition(String footsDecomposition) {
-        this.footsDecomposition = footsDecomposition;
+    public void setSyllableDecomposition(String syllableDecomposition) {
+        this.syllableDecomposition = syllableDecomposition;
     }
 }

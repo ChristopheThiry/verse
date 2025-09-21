@@ -60,12 +60,12 @@ The service will respond with a JSON object containing a list of objects, where 
         {
             "lineNumber": 1,
             "syllableCount": 12,
-            "footsDecomposition": "2 2 2 2 2 2"
+            "syllableDecomposition": "ma-seu-l é-toi-le est-mor-te et-mon-luth-con-stel-lé"
         },
         {
             "lineNumber": 2,
             "syllableCount": 12,
-            "footsDecomposition": "2 2 2 2 2 2"
+            "syllableDecomposition": "por-te-le-so-leil-noir-de-la-mé-lan-co-lie"
         }
     ]
 }
