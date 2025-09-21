@@ -51,7 +51,7 @@ public class SyllableCounterServiceTest {
             "chanter",
             "table",
             "ordinateur",
-            "ah je ris de me contempler"
+            "aorte"
         );
         SyllableCountResponse response = syllableCounterService.analyzeLines(lines);
         List<LineAnalysisResult> results = response.getResults();
@@ -61,7 +61,21 @@ public class SyllableCounterServiceTest {
         assertEquals("chan-ter", results.get(1).getSyllableDecomposition());
         assertEquals("ta-ble", results.get(2).getSyllableDecomposition());
         assertEquals("or-di-na-teur", results.get(3).getSyllableDecomposition());
-        assertEquals("ah-je-ris-de-me-con-tem-pler", results.get(4).getSyllableDecomposition());
+        assertEquals("a-or-te", results.get(4).getSyllableDecomposition());
+    }
+
+    @Test
+    public void testUserReportedIssues() {
+        List<String> lines = List.of(
+            "au pays parfumé que le soleil caresse",
+            "j'ai connu sous un dais d'arbres tout empourprés"
+        );
+        SyllableCountResponse response = syllableCounterService.analyzeLines(lines);
+        List<LineAnalysisResult> results = response.getResults();
+
+        assertEquals(2, results.size());
+        assertEquals("au-pays-par-fu-mé-que-le-so-leil-ca-res-se", results.get(0).getSyllableDecomposition());
+        assertEquals("j'ai-con-nu-sous-un-dais-d'ar-bres-tout-em-pour-prés", results.get(1).getSyllableDecomposition());
     }
 
     @org.junit.jupiter.api.Disabled("This test contains a line ('Au pays parfumé...') that requires poetic interpretation (diérèse on 'pays') to reach 12 syllables, which is beyond the scope of the current heuristic-based algorithm.")

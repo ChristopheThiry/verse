@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
 @Service
 public class SyllableCounterService {
 
-    private static final String VOWELS = "aeiouy";
+    private static final String VOWELS = "aeiouyàâéèêëîïôùûü";
     private static final Set<String> H_ASPIRE_WORDS = Set.of("haut", "heros", "hache", "haie", "haine", "harpe", "hasard", "honte", "hussard", "hollande", "handicap", "hibou", "herisson");
 
     private static final Set<String> CONSONANT_CLUSTERS = Set.of("bl", "br", "ch", "cl", "cr", "dr", "fl", "fr", "gl", "gr", "ph", "pl", "pr", "sh", "th", "tr", "vr", "gn");
@@ -55,6 +55,8 @@ public class SyllableCounterService {
         return String.join("-", resultSyllables);
     }
 
+    private static final Set<String> VOWEL_DIGRAPHS = Set.of("au", "ou", "ai", "ei", "oi", "eu", "ay");
+
     private String decomposeWord(String word) {
         if (word == null || word.isEmpty()) {
             return "";
@@ -63,9 +65,10 @@ public class SyllableCounterService {
         List<Integer> vowelIndices = new ArrayList<>();
         for (int i = 0; i < word.length(); i++) {
             if (isVowel(word.charAt(i))) {
-                if (vowelIndices.isEmpty() || i > vowelIndices.get(vowelIndices.size() - 1) + 1) {
-                    vowelIndices.add(i);
+                if (i > 0 && isVowel(word.charAt(i - 1)) && VOWEL_DIGRAPHS.contains(word.substring(i - 1, i + 1))) {
+                    continue;
                 }
+                vowelIndices.add(i);
             }
         }
 
@@ -78,28 +81,43 @@ public class SyllableCounterService {
         for (int i = 0; i < vowelIndices.size() - 1; i++) {
             int v1 = vowelIndices.get(i);
             int v2 = vowelIndices.get(i + 1);
-            int consonantsBetween = v2 - v1 - 1;
 
+            int v1_end = v1;
+            if (v1 + 1 < word.length() && isVowel(word.charAt(v1 + 1)) && VOWEL_DIGRAPHS.contains(word.substring(v1, v1 + 2))) {
+                v1_end = v1 + 1;
+            }
+
+            int consonantsBetween = v2 - v1_end - 1;
             int splitIndex;
+
             if (consonantsBetween == 1) {
-                splitIndex = v1 + 1; // V-CV
+                splitIndex = v1_end + 1;
             } else if (consonantsBetween == 2) {
-                String cluster = word.substring(v1 + 1, v1 + 3);
+                String cluster = word.substring(v1_end + 1, v1_end + 3);
                 if (CONSONANT_CLUSTERS.contains(cluster)) {
-                    splitIndex = v1 + 1; // V-CCV
+                    splitIndex = v1_end + 1;
                 } else {
-                    splitIndex = v1 + 2; // VC-CV
+                    splitIndex = v1_end + 2;
                 }
             } else if (consonantsBetween == 3) {
-                splitIndex = v1 + 2; // VC-CCV
+                splitIndex = v1_end + 2;
             } else {
-                splitIndex = v1 + (consonantsBetween / 2) + 1;
+                splitIndex = v1_end + (consonantsBetween / 2) + 1;
             }
 
             syllables.add(word.substring(start, splitIndex));
             start = splitIndex;
         }
         syllables.add(word.substring(start));
+
+        if (syllables.size() > 1) {
+            String lastSyllable = syllables.get(syllables.size() - 1);
+            if (lastSyllable.equals("e") && word.endsWith("e") && !word.endsWith("ée")) {
+                String secondToLast = syllables.get(syllables.size() - 2);
+                syllables.set(syllables.size() - 2, secondToLast + lastSyllable);
+                syllables.remove(syllables.size() - 1);
+            }
+        }
 
         return String.join("-", syllables);
     }
